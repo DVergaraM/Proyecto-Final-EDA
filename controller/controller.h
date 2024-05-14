@@ -8,11 +8,16 @@ set<User *> projectsOwners;
 set<StatusType> projectStates;
 set<string> projectsDescriptions;
 
+/**
+ * @brief Verifica si la fecha es válida.
+ * @param date Fecha a validar.
+ * @return bool
+ */
 bool isDateValid(string date)
 {
     if (date.size() != 10)
         return false;
-    if (date[2] != '-' || date[5] != '-')
+    if (date[2] != ' ' || date[5] != ' ')
         return false;
     if (stoi(date.substr(0, 2)) > 31 || stoi(date.substr(0, 2)) < 1)
         return false;
@@ -23,13 +28,19 @@ bool isDateValid(string date)
     return true;
 }
 
+
+/**
+ * @brief Crea un proyecto nuevo para el usuario dado.
+ * @param user El usuario quien creará el proyecto.
+ * @return void
+ */
 void createProject(User &user)
 {
     Project newProject;
     int id = rand() % 1000 + 1;
     string title;
     string description;
-    newProject.setId(id);
+
     for (auto &project : projects)
     {
         if (project.getId() == id)
@@ -38,9 +49,14 @@ void createProject(User &user)
             return;
         }
     }
-    newProject.setOwner(&user);
+
     cout << "Enter project title: ";
     cin >> title;
+    cout << "Enter the project description: ";
+    cin >> description;
+
+    newProject.setId(id);
+    newProject.setOwner(&user);
     newProject.setTitle(title);
     newProject.setDescription(description);
     newProject.addMember(&user);
@@ -53,6 +69,11 @@ void createProject(User &user)
     cout << "Project created successfully!" << endl;
 }
 
+/**
+ * @brief Muestra la información sobre un proyecto, si este es encontrado.
+ * @param project Proyecto a buscar.
+ * @return void
+ */
 void getProjectInfo(Project &project)
 {
     if (projects.find(project) == projects.end())
@@ -67,12 +88,23 @@ void getProjectInfo(Project &project)
     cout << endl;
 }
 
+/**
+ * @brief Agrega un usuario a una tarea.
+ * @param task Tarea a la cual asignar un usuario.
+ * @param user Usuario que será agregado a la tarea.
+ * @return void
+ */
 void addAssigneeToTask(Task &task, User &user)
 {
     task.addAssignee(&user);
     cout << "Assignee added successfully!" << endl;
 }
 
+/**
+ * @brief Escoge entre los usuarios, quienes serán asignados a la tarea.
+ * @param task Tarea a la cual se le asignará usuarios.
+ * @return void
+ */
 void chooseUsersForTask(Task &task)
 {
     int choice;
@@ -97,7 +129,13 @@ void chooseUsersForTask(Task &task)
     }
 }
 
-void showStatesForTasks(Project &project) {
+/**
+ * @brief Muestra los estados de las tareas en un proyecto.
+ * @param project Proyecto al cual se le mostrarán los estados de tarea.
+ * @return void
+ */
+void showStatesForTasks(Project &project)
+{
     if (projects.find(project) == projects.end())
     {
         cout << "Project not found!" << endl;
