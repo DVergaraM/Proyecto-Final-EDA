@@ -197,11 +197,20 @@ public:
         cout << "No hay notas que eliminar" << endl;
     }
 
+    /**
+     * @brief Método para agregar una reacción a latarea.
+     * @return void
+     */
     void addReaction(ReactionType reaction)
     {
         reactions[reaction]++;
     }
 
+    /**
+     * @brief Método para eliminar la última reacción de la tarea.
+     * @return void
+     * @pre No hay reacciones del tipo en la tarea.
+     */
     void removeReaction(ReactionType reaction)
     {
         if (reactions[reaction] == 0)
@@ -212,6 +221,11 @@ public:
         reactions[reaction]--;
     }
 
+    /**
+     * @brief Muestra las notas en la tarea.
+     * @return void
+     * @pre No hay notas en la tarea.
+     */
     void showNotes()
     {
         if (notes.empty())
@@ -227,6 +241,9 @@ public:
         }
     }
 
+    /**
+     * @brief Destructor de la tarea, por medio de la eliminación de las notas hasta que este vacio.
+     */
     ~Task()
     {
         while (!notes.empty())
@@ -235,6 +252,14 @@ public:
         }
     }
 
+    // Sobrecarga de operadores
+
+    /**
+     * @brief Sobrecarga del operador de inserción
+     * @param os Stream de salida.
+     * @param task Tarea a imprimir
+     * @return ostream&
+     */
     friend ostream &operator<<(ostream &os, const Task &task)
     {
         os << "Title: " << task.getTitle() << endl;
@@ -270,11 +295,21 @@ public:
         return os;
     }
 
+    /**
+     * @brief Sobrecarga del operador de comparación menor que
+     * @param task Tarea a comparar
+     * @return bool
+     */
     bool operator<(const Task &task) const
     {
         return this->dueDate.year < task.getDueDate().year;
     }
 
+    /**
+     * @brief Sobrecarga del operador de comparación igual que
+     * @param task Tarea a comparar
+     * @return bool
+     */
     bool operator==(const Task &task) const
     {
         return this->id == task.getId();
