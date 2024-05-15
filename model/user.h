@@ -124,6 +124,24 @@ public:
         }
         return os;
     }
+
+    // Método toCSV para convertir un objeto de la clase Usuario a un string en formato CSV
+    string toCSV() const
+    {
+        return id + "," + username + "," + password + "," + role;
+    }
+
+    // Método fromCSV para convertir un string en formato CSV a un objeto de la clase Usuario
+    static User fromCSV(string linea)
+    {
+        stringstream ss(linea);
+        string nombre, contrasena, correo, telefono;
+        getline(ss, nombre, ',');
+        getline(ss, contrasena, ',');
+        getline(ss, correo, ',');
+        getline(ss, telefono, ',');
+      //  return User(nombre, contrasena, correo, telefono);
+    }
 };
 
 #endif // USER_H
