@@ -100,8 +100,54 @@ public:
     void setPriority(PriorityType priority) { this->priority = priority; }
     void setAssignees(std::set<User *> assignees) { this->assignees = assignees; }
     void addAssignee(User *assignee) { assignees.insert(assignee); }
-    void removeAssignee(User *assignee) { assignees.erase(assignee); }
+    void removeAssignee(User *assignee) { assignees.erase(remove(assignees.begin(), assignees.end(), assignee), assignees.end()); }
     void setReporter(User *reporter) { this->reporter = reporter; }
+
+    /**
+     * @brief Actualiza un usuario
+     * @param oldUser Usuario viejo
+     * @param newUser Usuario nuevo
+     * @return void
+     */
+    void updateAssignee(User *oldUser, User *newUser)
+    {
+        removeAssignee(oldUser);
+        addAssignee(newUser);
+    }
+
+    /**
+     * @brief Actualiza una nota
+     * @param oldNote Nota vieja
+     * @param newNote Nota nueva
+     * @return void
+     */
+    void updateNote(Note oldNote, Note newNote)
+    {
+        stack<Note> temp;
+        while (!notes.empty())
+        {
+            if (notes.top() == oldNote)
+            {
+                temp.push(newNote);
+            }
+            else
+            {
+                temp.push(notes.top());
+            }
+            notes.pop();
+        }
+        while (!temp.empty())
+        {
+            notes.push(temp.top());
+            temp.pop();
+        }
+    }
+
+    void updateReaction(ReactionType oldReaction, ReactionType newReaction)
+    {
+        reactions[newReaction] = reactions[oldReaction];
+        reactions.erase(oldReaction);
+    }
 
     // Métodos
 

@@ -80,6 +80,17 @@ public:
         }
     }
 
+    void updateProject(Project *oldProject, Project *newProject)
+    {
+        removeProject(oldProject);
+        addProject(newProject);
+    }
+
+    void showProject(Project *project, bool full)
+    {
+        full ? cout << *project << endl : cout << project->getTitle() << endl;
+    }
+
     /**
      * @brief Muestra los títulos de los proyectos a los que pertenece el usuario.
      * @return void
@@ -98,11 +109,10 @@ public:
         }
     }
 
-
     /**
      * @brief Muestra el título del tablero principal de cada proyecto al que pertenece el usuario.
      * @return void
-    */
+     */
     void showBoards()
     {
         if (projects == nullptr)
@@ -120,7 +130,7 @@ public:
     /**
      * @brief Muestra las tareas de cada proyecto al que pertenece el usuario.
      * @return void
-    */
+     */
     void showTasks()
     {
         if (projects == nullptr)
@@ -142,7 +152,7 @@ public:
 
     /**
      * @brief Destructor de usuario.
-    */
+     */
     ~User()
     {
         delete projects;
@@ -154,7 +164,7 @@ public:
      * @param os Stream de salida.
      * @param user Usuario a imprimir.
      * @return ostream&
-    */
+     */
     friend ostream &operator<<(ostream &os, const User &user)
     {
         os << "ID: " << user.getId() << endl;

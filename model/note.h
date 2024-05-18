@@ -44,7 +44,7 @@ private:
 public:
     /**
      * @brief Constructor vacío de la clase Note
-    */
+     */
     Note() : author(nullptr), title(""), content("") {}
     /**
      * @brief Constructor de la clase Note
@@ -81,11 +81,30 @@ public:
      */
     void removeComment()
     {
-        if (!comments.empty()) {
+        if (!comments.empty())
+        {
             comments.pop();
             return;
         }
         cout << "No hay comentarios que eliminar" << endl;
+    }
+
+    void updateComment(Comment oldComment, Comment newComment)
+    {
+        stack<Comment> temp;
+        while (!comments.empty())
+        {
+            if (comments.top().author == oldComment.author && comments.top().content == oldComment.content)
+            {
+                temp.push(newComment);
+            }
+            else
+            {
+                temp.push(comments.top());
+            }
+            comments.pop();
+        }
+        comments = temp;
     }
 
     /**

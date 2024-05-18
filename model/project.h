@@ -16,20 +16,23 @@ private:
 public:
     /**
      * @brief Constructor vacío de un proyecto
-    */
-    Project() : owner(nullptr), title("") {
+     */
+    Project() : owner(nullptr), title("")
+    {
         id = rand() % 1000 + 1;
     }
     /**
      * @brief Constructor de un proyecto solo con título.
-    */
-    Project(string title) : owner(nullptr), title(title) {
+     */
+    Project(string title) : owner(nullptr), title(title)
+    {
         id = rand() % 1000 + 1;
     }
     /**
      * @brief Constructor de un proyecto con dueño y título
-    */
-    Project(User *owner, string title) : owner(owner), title(title) {
+     */
+    Project(User *owner, string title) : owner(owner), title(title)
+    {
         id = rand() % 1000 + 1;
     }
 
@@ -49,11 +52,28 @@ public:
     void setBoard(Board board) { this->board = board; }
     void setMembers(std::set<User *> members) { this->members = members; }
     void addMember(User *member) { members.insert(member); }
+    void removeMember(User *member)
+    {
+        members.erase(remove(members.begin(), members.end(), member), members.end());
+    }
+
+    // Métodos de clase
+    void updateMember(User *oldMember, User *newMember)
+    {
+        removeMember(oldMember);
+        addMember(newMember);
+    }
 
     /**
      * @brief Destructor de un proyecto.
-    */
-    ~Project() {}
+     */
+    ~Project()
+    {
+        for (auto &member : members)
+        {
+            member->getProjects()->erase(this);
+        }
+    }
 
     // Sobrecarga de operadores
 
@@ -62,10 +82,20 @@ public:
      * @param os Stream de salida.
      * @param project Proyecto a imprimir.
      * @return ostream&
-    */
+     */
     friend ostream &operator<<(ostream &os, const Project &project)
     {
-        os << project.title;
+        os << "ID: " << project.id << endl;
+        os << "Owner: " << project.owner->getUsername() << endl;
+        os << "Title: " << project.title << endl;
+        os << "Description: " << project.description << endl;
+        os << "Board: " << project.board.getTitle() << endl;
+        os << "Members: ";
+        for (auto &member : project.members)
+        {
+            os << "- " << member->getUsername() << endl;
+        }
+
         return os;
     }
 
@@ -73,7 +103,7 @@ public:
      * @brief Sobrecarga del operador de menor que.
      * @param project Proyecto a comparar.
      * @return bool
-    */
+     */
     bool operator<(const Project &project) const
     {
         return id < project.getId();
@@ -83,7 +113,7 @@ public:
      * @brief Sobrecarga del operador de igual que.
      * @param project Proyecto a comparar.
      * @return bool
-    */
+     */
     bool operator==(const Project &project) const
     {
         return id == project.getId();
