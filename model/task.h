@@ -13,6 +13,44 @@ struct Date
     int year;
     Date() : day(1), month(1), year(2000) {}
     Date(int day, int month, int year) : day(day), month(month), year(year) {}
+    friend ostream &operator<<(ostream &os, const Date &date)
+    {
+        os << date.day << "/" << date.month << "/" << date.year;
+        return os;
+    }
+
+    bool operator<(const Date &date)
+    {
+        if (this->year < date.year)
+            return true;
+        if (this->year > date.year)
+            return false;
+        if (this->month < date.month)
+            return true;
+        if (this->month > date.month)
+            return false;
+        if (this->day < date.day)
+            return true;
+        return false;
+    }
+
+    bool operator<=(const Date &date)
+    {
+        return *this < date || *this == date;
+    }
+    bool operator>(const Date &date)
+    {
+        return !(*this <= date);
+    }
+    bool operator>=(const Date &date)
+    {
+        return !(*this < date);
+    }
+
+    bool operator==(const Date &date)
+    {
+        return this->day == date.day && this->month == date.month && this->year == date.year;
+    }
 };
 
 class Task

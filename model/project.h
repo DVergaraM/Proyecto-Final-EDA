@@ -11,13 +11,15 @@ private:
     string title;
     string description;
     Board board;
+    Date creationDate;
+    Date dueDate;
     std::set<User *> members;
 
 public:
     /**
      * @brief Constructor vacío de un proyecto
      */
-    Project() : owner(nullptr), title("")
+    Project() : owner(nullptr), title(""), creationDate(), dueDate()
     {
         id = rand() % 1000 + 1;
     }
@@ -31,7 +33,7 @@ public:
     /**
      * @brief Constructor de un proyecto con dueño y título
      */
-    Project(User *owner, string title) : owner(owner), title(title)
+    Project(User *owner, string title, Date creationDate, Date dueDate) : owner(owner), title(title), creationDate(creationDate), dueDate(dueDate)
     {
         id = rand() % 1000 + 1;
     }
@@ -42,6 +44,8 @@ public:
     string getTitle() const { return title; }
     string getDescription() const { return description; }
     Board getBoard() const { return board; }
+    Date getCreationDate() const { return creationDate; }
+    Date getDueDate() const { return dueDate; }
     std::set<User *> getMembers() const { return members; }
 
     // Setters
@@ -49,6 +53,7 @@ public:
     void setOwner(User *owner) { this->owner = owner; }
     void setTitle(string title) { this->title = title; }
     void setDescription(string description) { this->description = description; }
+    void setDueDate(Date dueDate) { this->dueDate = dueDate; }
     void setBoard(Board board) { this->board = board; }
     void setMembers(std::set<User *> members) { this->members = members; }
     void addMember(User *member) { members.insert(member); }
@@ -106,7 +111,7 @@ public:
      */
     bool operator<(const Project &project) const
     {
-        return id < project.getId();
+        return dueDate < project.getDueDate();
     }
 
     /**
