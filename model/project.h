@@ -111,7 +111,7 @@ public:
      */
     bool operator<(const Project &project) const
     {
-        return dueDate < project.getDueDate();
+        return this->getDueDate() < project.getDueDate();
     }
 
     /**

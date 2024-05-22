@@ -23,14 +23,15 @@ struct Date
     {
         if (this->year < date.year)
             return true;
-        if (this->year > date.year)
-            return false;
         if (this->month < date.month)
             return true;
-        if (this->month > date.month)
-            return false;
         if (this->day < date.day)
             return true;
+        if (this->year > date.year)
+            return false;
+        if (this->month > date.month)
+            return false;
+
         return false;
     }
 
@@ -49,7 +50,9 @@ struct Date
 
     bool operator==(const Date &date)
     {
-        return this->day == date.day && this->month == date.month && this->year == date.year;
+        return this->day == date.day &&
+               this->month == date.month &&
+               this->year == date.year;
     }
 };
 
