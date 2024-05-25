@@ -69,7 +69,6 @@ private:
     User *reporter;
     vector<User *> watchers;
     stack<Note> notes;
-    map<ReactionType, int> reactions;
 
 public:
     /**
@@ -77,12 +76,6 @@ public:
      */
     Task() : title(""), description(""), dueDate(Date()), status(OPEN), priority(LOW), assignees({}), reporter(nullptr)
     {
-        reactions[LIKE] = 0;
-        reactions[LAUGH] = 0;
-        reactions[WOW] = 0;
-        reactions[SAD] = 0;
-        reactions[ANGRY] = 0;
-        reactions[NONE] = 0;
         id = rand() % 1000 + 1;
     }
     /**
@@ -90,12 +83,6 @@ public:
      */
     Task(string title, string description, User *reporter, Date dueDate) : title(title), description(description), dueDate(dueDate), status(OPEN), priority(LOW), assignees({}), reporter(reporter)
     {
-        reactions[LIKE] = 0;
-        reactions[LAUGH] = 0;
-        reactions[WOW] = 0;
-        reactions[SAD] = 0;
-        reactions[ANGRY] = 0;
-        reactions[NONE] = 0;
         id = rand() % 1000 + 1;
     }
 
@@ -110,26 +97,8 @@ public:
     User *getReporter() const { return reporter; }
     vector<User *> getWatchers() const { return watchers; }
     stack<Note> getNotes() const { return notes; }
-    map<ReactionType, int> getReactions() const { return reactions; }
-    std::set<ReactionType> getReactionsKeys() const
-    {
-        std::set<ReactionType> reactionSet;
-        for (auto reaction : reactions)
-        {
-            reactionSet.insert(reaction.first);
-        }
-        return reactionSet;
-    }
-
-    std::set<int> getReactionsValues() const
-    {
-        std::set<int> reactionValues;
-        for (auto reaction : reactions)
-        {
-            reactionValues.insert(reaction.second);
-        }
-        return reactionValues;
-    }
+    
+    
 
     // Setters
 
@@ -184,11 +153,7 @@ public:
         }
     }
 
-    void updateReaction(ReactionType oldReaction, ReactionType newReaction)
-    {
-        reactions[newReaction] = reactions[oldReaction];
-        reactions.erase(oldReaction);
-    }
+    
 
     // Métodos
 
@@ -284,29 +249,7 @@ public:
         cout << "No hay notas que eliminar" << endl;
     }
 
-    /**
-     * @brief Método para agregar una reacción a latarea.
-     * @return void
-     */
-    void addReaction(ReactionType reaction)
-    {
-        reactions[reaction]++;
-    }
-
-    /**
-     * @brief Método para eliminar la última reacción de la tarea.
-     * @return void
-     * @pre No hay reacciones del tipo en la tarea.
-     */
-    void removeReaction(ReactionType reaction)
-    {
-        if (reactions[reaction] == 0)
-        {
-            cout << "No hay reacciones que eliminar" << endl;
-            return;
-        }
-        reactions[reaction]--;
-    }
+    
 
     /**
      * @brief Muestra las notas en la tarea.
@@ -372,11 +315,6 @@ public:
         {
             os << temp.top().getTitle() << ": " << temp.top().getContent() << endl;
             temp.pop();
-        }
-        os << "Reactions: ";
-        for (auto reaction : task.getReactions())
-        {
-            os << reaction.first << ": " << reaction.second << " ";
         }
         os << endl;
         return os;
