@@ -28,7 +28,6 @@ bool isDateValid(string date)
     return true;
 }
 
-
 /**
  * @brief Crea un proyecto nuevo para el usuario dado.
  * @param user El usuario quien creará el proyecto.
@@ -74,7 +73,7 @@ void createProject(User &user)
  * @param project Proyecto a buscar.
  * @return void
  */
-void getProjectInfo(Project &project)
+void getProjectInfo(const Project &project)
 {
     if (projects.find(project) == projects.end())
     {
@@ -154,5 +153,199 @@ void showStatesForTasks(Project &project)
             cout << "Task: " << task.getTitle() << " State: " << task.getStatus() << endl;
             tasks.pop();
         }
+    }
+}
+
+/**
+ * @brief Muestra los proyectos de un usuario, organizados por su fecha de creación
+ * @param user Usuario al que se le mostraran sus proyectos
+ * @return void
+ */
+void showProjectsByCreationDate(User &user)
+{
+    set<Project *> userProjects = *user.getProjects();
+    sort(userProjects.begin(), userProjects.end(), [](Project *a, Project *b)
+         { return a->getCreationDate() < b->getCreationDate(); });
+    for (auto project : userProjects)
+    {
+        cout << "Project title: " << project->getTitle() << endl;
+        cout << "Project creation date: " << project->getCreationDate() << endl;
+        cout << endl;
+    }
+}
+
+/**
+ * @brief Muestra los proyectos de un usuario, organizados por su fecha de vencimiento
+ * @param user Usuario al que se le mostraran sus proyectos
+ * @return void
+ */
+void showProjectsByDueDate(User &user)
+{
+    set<Project *> userProjects = *user.getProjects();
+    sort(userProjects.begin(), userProjects.end(), [](Project *a, Project *b)
+         { return a->getDueDate() < b->getDueDate(); });
+    for (auto project : userProjects)
+    {
+        cout << "Project title: " << project->getTitle() << endl;
+        cout << "Project due date: " << project->getDueDate() << endl;
+        cout << endl;
+    }
+}
+
+/**
+ * @brief Permite al usuario ver sus proyectos organizados por fecha.
+ * @param user Usuario al que se le mostraran sus proyectos
+ * @return void
+ */
+void showProjectsSorted(User &user)
+{
+    int choice;
+    cout << "Sort projects by: " << endl;
+    cout << "1. Creation date" << endl;
+    cout << "2. Due date" << endl;
+    cout << "Enter your choice: ";
+    cin >> choice;
+
+    if (choice == 1)
+    {
+        showProjectsByCreationDate(user);
+    }
+    else if (choice == 2)
+    {
+        showProjectsByDueDate(user);
+    }
+    else
+    {
+        cout << "Invalid choice!" << endl;
+    }
+}
+
+/**
+ * @brief Busca por el nombre de un proyecto con respecto al usuario.
+ * @param user Usuario al que se le buscará el nombre del proyecto
+ * @param projectName Nombre del proyecto
+ * @return void
+ */
+void searchProject(const User &user, string projectName)
+{
+    set<Project *> userProjects = *user.getProjects();
+    userProjects.empty() ? cout << "No projects to show" << endl : cout << "Projects: " << endl;
+    for (auto &project : userProjects)
+    {
+        if (project->getTitle() == projectName)
+        {
+            getProjectInfo(*project);
+            return;
+        }
+    }
+}
+
+/**
+ * @brief Muestra las tareas que están relacionadas al proyecto
+ * @param project Proyecto al que se le mirarán las tareas
+ * @return void
+ */
+void showTasksRelatedWithProject(Project &project)
+{
+    if (projects.find(project) == projects.end())
+    {
+        cout << "Project not found!" << endl;
+        return;
+    }
+    Board board = project.getBoard();
+    map<PriorityType, queue<Task>> taskQueues = board.getTaskQueues();
+    taskQueues.empty() ? cout << "No tasks to show" << endl : cout << "Tasks: " << endl;
+    for (auto &taskQueue : taskQueues)
+    {
+        cout << "Priority: " << taskQueue.first << endl;
+        queue<Task> tasks = taskQueue.second;
+        while (!tasks.empty())
+        {
+            Task task = tasks.front();
+            cout << "Task: " << task.getTitle() << " State: " << task.getStatus() << endl;
+            tasks.pop();
+        }
+    }
+};
+
+/**
+ * @brief Permite agregar una reacción a la nota escogida.
+ * @param note Nota a la que se le agregará la reacción
+ * @param reaction Reacción a agregar a la nota
+ * @return void
+ */
+void addReactionToNote(Note &note, ReactionType &reaction)
+{
+    note.addReaction(reaction);
+    cout << "Reacción " << reactionToString(reaction) << " agregada exitosamente!" << endl;
+}
+
+/**
+ * @brief Permite eliminar un tipo de reacción de una nota
+ * @param note Nota a la que se le eliminará 1 de la reacción escogida
+ * @param reaction Reacción a la cual se le eliminará 1
+ * @return void
+*/
+void removeReactionFromNote(Note &note, ReactionType &reaction) {
+    if (note.removeReaction(reaction)) {
+        cout << "Reacción " << reactionToString(reaction) << " eliminada exitosamente!" << endl;
+    } else {
+        cout << "No hay reacciones que eliminar" << endl;
+    }
+}
+
+/**
+ * @brief Permite escoger la reacción que se le asignará a la nota escogida.
+ * @param note Nota a la que se le agregará la reacción
+ * @return void
+ */
+void chooseReaction(Note &note)
+{
+
+    ReactionType reaction;
+
+    cout << "Escoge una reacción: " << endl;
+    cout << "1. Me gusta" << endl;
+    cout << "2. Corazón" << endl;
+    cout << "3. Risa" << endl;
+    cout << "4. Sorpresa" << endl;
+    cout << "5. Triste" << endl;
+    cout << "6. Enojado" << endl;
+    cout << "7. Ninguno" << endl;
+
+    int choice;
+
+    while (true)
+    {
+        cout << "Enter your choice: ";
+        cin >> choice;
+        if (choice == 7)
+            break;
+        if (choice < 1 || choice > 7)
+        {
+            cout << "Invalid choice!" << endl;
+            continue;
+        }
+        reaction = (ReactionType)(choice - 1);
+        addReactionToNote(note, reaction);
+        break;
+    }
+}
+
+/**
+ * @brief Permite mostrar la cantidad de reacciones por tipo, de una nota
+ * @param note Nota a la que se le visualizaran las reacciones
+ * @return void
+ */
+void displayReactionsFromNote(Note &note)
+{
+
+    map<ReactionType, int> reactions = note.getReactions();
+
+    cout << "Reacciones: " << endl;
+
+    for (auto reaction : reactions)
+    {
+        cout << reactionToString(reaction.first) << ": " << reaction.second << endl;
     }
 }

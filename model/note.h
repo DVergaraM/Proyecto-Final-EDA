@@ -121,14 +121,14 @@ public:
      * @return void
      * @pre No hay reacciones del tipo en la tarea.
      */
-    void removeReaction(ReactionType reaction)
+    bool removeReaction(ReactionType reaction)
     {
         if (reactions[reaction] == 0)
         {
-            cout << "No hay reacciones que eliminar" << endl;
-            return;
+            return false;
         }
         reactions[reaction]--;
+        return true;
     }
 
     /**
