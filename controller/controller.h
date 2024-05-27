@@ -138,3 +138,120 @@ void ver_tareas_proyectos(const vector<Project *> &proyectos)
         cout << endl;
     }
 }
+
+void responsables_por_nombre(const vector<Task> &tareas)
+{
+
+    vector<const User *> responsables;
+    for (const Task &tarea : tareas)
+    {
+        const User *responsable = tarea.getAssignee();
+        if (responsable != nullptr)
+        {
+            responsables.push_back(responsable);
+        }
+    }
+
+    sort(responsables.begin(), responsables.end(), [](const User *a, const User *b)
+         { return a->getUsername() < b->getUsername(); });
+
+    // Mostramos la lista ordenada de responsables por nombre
+    cout << "Responsables de tareas ordenados por nombre:" << endl;
+    for (const User *responsable : responsables)
+    {
+        cout << "- " << responsable->getUsername() << endl;
+    }
+}
+
+// Enumeración para la frecuencia de repetición
+enum class RecurrenceFrequency
+{
+    DIARIA,
+    SEMANAL,
+    MENSUAL
+};
+
+// Clase para representar una actividad recurrente
+class RecurringActivity
+{
+private:
+    string title;
+    string description;
+    RecurrenceFrequency frequency;
+
+public:
+    // Constructor
+    RecurringActivity(const string &title, const string &description, RecurrenceFrequency frequency)
+        : title(title), description(description), frequency(frequency) {}
+
+    // Método para obtener la frecuencia de repetición como cadena de caracteres
+    string getFrequencyAsString() const
+    {
+        switch (frequency)
+        {
+        case RecurrenceFrequency::DIARIA:
+            return "Diaria";
+        case RecurrenceFrequency::SEMANAL:
+            return "Semanal";
+        case RecurrenceFrequency::MENSUAL:
+            return "Mensual";
+        default:
+            return "Desconocida";
+        }
+    }
+
+    // Método para imprimir los detalles de la actividad recurrente
+    void printDetails() const
+    {
+        cout << "Título: " << title << endl;
+        cout << "Descripción: " << description << endl;
+        cout << "Frecuencia de repetición: " << getFrequencyAsString() << endl;
+    }
+};
+
+// Función para crear actividades recurrentes
+void actividades_recurrentes()
+{
+    // Solicitar al usuario los detalles de la actividad recurrente
+    string titulo, descripcion;
+    int opcion_frecuencia;
+
+    cout << "Ingrese el título de la actividad: ";
+    getline(cin >> ws, titulo);
+
+    cout << "Ingrese la descripción de la actividad: ";
+    getline(cin >> ws, descripcion);
+
+    cout << "Seleccione la frecuencia de repetición:" << std::endl;
+    cout << "1. Diaria" << endl;
+    cout << "2. Semanal" << endl;
+    cout << "3. Mensual" << endl;
+    cout << "Opción: ";
+    cin >> opcion_frecuencia;
+
+    // Validar la opción de frecuencia
+    RecurrenceFrequency frecuencia;
+    switch (opcion_frecuencia)
+    {
+    case 1:
+        frecuencia = RecurrenceFrequency::DIARIA;
+        break;
+    case 2:
+        frecuencia = RecurrenceFrequency::SEMANAL;
+        break;
+    case 3:
+        frecuencia = RecurrenceFrequency::MENSUAL;
+        break;
+    default:
+        cout << "Opción de frecuencia inválida. La actividad no se programó." << endl;
+        return;
+    }
+
+    // Crear la actividad recurrente
+    RecurringActivity actividad_recurrente(titulo, descripcion, frecuencia);
+
+    // Imprimir los detalles de la actividad recurrente
+    cout << endl
+         << "Actividad recurrente creada exitosamente:" << endl;
+    actividad_recurrente.printDetails();
+}
