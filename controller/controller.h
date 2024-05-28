@@ -1,7 +1,8 @@
 #include "../model/user.h"
 #include <deque>
 
-deque<User> users;
+deque<User>
+    users;
 set<Project> projects;
 set<string> projectsTitles;
 set<User *> projectsOwners;
@@ -44,15 +45,15 @@ void createProject(User &user)
     {
         if (project.getId() == id)
         {
-            cout << "Project with this id already exists!" << endl;
+            cout << "¡Proyecto con este ID ya existe!" << endl;
             return;
         }
     }
 
-    cout << "Enter project title: ";
-    cin >> title;
-    cout << "Enter the project description: ";
-    cin >> description;
+    cout << "Ingresa el título del proyecto: ";
+    getline(cin >> ws, title);
+    cout << "Ingresa la descripción del proyecto: ";
+    getline(cin >> ws, description);
 
     newProject.setId(id);
     newProject.setOwner(&user);
@@ -65,7 +66,39 @@ void createProject(User &user)
     projectsOwners.insert(&user);
     projectsDescriptions.insert(description);
     projectStates.insert(newProject.getBoard().getState());
-    cout << "Project created successfully!" << endl;
+    cout << "¡Proyecto creado exitosamente!" << endl;
+}
+
+void updateProject(Project &project)
+{
+    int choice;
+    string newTitle;
+    string newDescription;
+
+    cout << "¿Qué quieres editar?: " << endl;
+    cout << "1. Título" << endl;
+    cout << "2. Descripción" << endl;
+    cout << "Ingresa tu opción: ";
+    cin >> choice;
+
+    switch (choice)
+    {
+    case 1:
+        cout << "Ingresa el nuevo título: ";
+        getline(cin >> ws, newTitle);
+        project.setTitle(newTitle);
+        cout << "Título actualizado correctamente" << endl;
+        break;
+    case 2:
+        cout << "Ingresa la nueva descripción: ";
+        getline(cin >> ws, newDescription);
+        project.setDescription(newDescription);
+        cout << "Descripción actualizada correctamente" << endl;
+        break;
+    default:
+        cout << "¡Opción inválida!" << endl;
+        break;
+    }
 }
 
 /**
@@ -77,13 +110,13 @@ void getProjectInfo(const Project &project)
 {
     if (projects.find(project) == projects.end())
     {
-        cout << "Project not found!" << endl;
+        cout << "¡Proyecto no encontrado!" << endl;
         return;
     }
-    cout << "Project title: " << project.getTitle() << endl;
-    cout << "Project description: " << project.getDescription() << endl;
-    cout << "Project owner: " << project.getOwner()->getUsername() << endl;
-    cout << "Project state: " << project.getBoard().getStateString() << endl;
+    cout << "Título del proyecto: " << project.getTitle() << endl;
+    cout << "Descripción del proyecto: " << project.getDescription() << endl;
+    cout << "Dueño del proyecto: " << project.getOwner()->getUsername() << endl;
+    cout << "Estado del proyecto: " << project.getBoard().getStateString() << endl;
     cout << endl;
 }
 
@@ -96,7 +129,7 @@ void getProjectInfo(const Project &project)
 void addAssigneeToTask(Task &task, User &user)
 {
     task.addAssignee(&user);
-    cout << "Assignee added successfully!" << endl;
+    cout << "¡Asignado agregado exitosamente!" << endl;
 }
 
 /**
@@ -107,21 +140,21 @@ void addAssigneeToTask(Task &task, User &user)
 void chooseUsersForTask(Task &task)
 {
     int choice;
-    cout << "Choose assignees for the task: " << endl;
+    cout << "Escoge asignados para la tarea: " << endl;
     for (int i = 0; i < users.size(); i++)
     {
         cout << i + 1 << ". " << users[i].getUsername() << endl;
     }
-    cout << "0. Exit" << endl;
+    cout << "0. Salir" << endl;
     while (true)
     {
-        cout << "Enter your choice: ";
+        cout << "Ingresa tu opción: ";
         cin >> choice;
         if (choice == 0)
             break;
         if (choice < 0 || choice > users.size())
         {
-            cout << "Invalid choice!" << endl;
+            cout << "¡Opción inválida!" << endl;
             continue;
         }
         addAssigneeToTask(task, users[choice - 1]);
@@ -137,20 +170,20 @@ void showStatesForTasks(Project &project)
 {
     if (projects.find(project) == projects.end())
     {
-        cout << "Project not found!" << endl;
+        cout << "¡Proyecto no encontrado!" << endl;
         return;
     }
     Board board = project.getBoard();
     map<PriorityType, queue<Task>> taskQueues = board.getTaskQueues();
-    taskQueues.empty() ? cout << "No tasks to show" << endl : cout << "Tasks: " << endl;
+    taskQueues.empty() ? cout << "No hay tareas para mostrar" << endl : cout << "Tareas: " << endl;
     for (auto &taskQueue : taskQueues)
     {
-        cout << "Priority: " << taskQueue.first << endl;
+        cout << "Prioridad: " << taskQueue.first << endl;
         queue<Task> tasks = taskQueue.second;
         while (!tasks.empty())
         {
             Task task = tasks.front();
-            cout << "Task: " << task.getTitle() << " State: " << task.getStatus() << endl;
+            cout << "Tarea: " << task.getTitle() << " Estado: " << task.getStatus() << endl;
             tasks.pop();
         }
     }
@@ -158,7 +191,7 @@ void showStatesForTasks(Project &project)
 
 /**
  * @brief Muestra los proyectos de un usuario, organizados por su fecha de creación
- * @param user Usuario al que se le mostraran sus proyectos
+ * @param user Usuario al que se le mostrarán sus proyectos
  * @return void
  */
 void showProjectsByCreationDate(User &user)
@@ -168,15 +201,15 @@ void showProjectsByCreationDate(User &user)
          { return a->getCreationDate() < b->getCreationDate(); });
     for (auto project : userProjects)
     {
-        cout << "Project title: " << project->getTitle() << endl;
-        cout << "Project creation date: " << project->getCreationDate() << endl;
+        cout << "Título del proyecto: " << project->getTitle() << endl;
+        cout << "Fecha de creación del proyecto: " << project->getCreationDate() << endl;
         cout << endl;
     }
 }
 
 /**
  * @brief Muestra los proyectos de un usuario, organizados por su fecha de vencimiento
- * @param user Usuario al que se le mostraran sus proyectos
+ * @param user Usuario al que se le mostrarán sus proyectos
  * @return void
  */
 void showProjectsByDueDate(User &user)
@@ -186,24 +219,24 @@ void showProjectsByDueDate(User &user)
          { return a->getDueDate() < b->getDueDate(); });
     for (auto project : userProjects)
     {
-        cout << "Project title: " << project->getTitle() << endl;
-        cout << "Project due date: " << project->getDueDate() << endl;
+        cout << "Título del proyecto: " << project->getTitle() << endl;
+        cout << "Fecha de vencimiento del proyecto: " << project->getDueDate() << endl;
         cout << endl;
     }
 }
 
 /**
  * @brief Permite al usuario ver sus proyectos organizados por fecha.
- * @param user Usuario al que se le mostraran sus proyectos
+ * @param user Usuario al que se le mostrarán sus proyectos
  * @return void
  */
 void showProjectsSorted(User &user)
 {
     int choice;
-    cout << "Sort projects by: " << endl;
-    cout << "1. Creation date" << endl;
-    cout << "2. Due date" << endl;
-    cout << "Enter your choice: ";
+    cout << "Ordenar proyectos por: " << endl;
+    cout << "1. Fecha de creación" << endl;
+    cout << "2. Fecha de vencimiento" << endl;
+    cout << "Ingresa tu opción: ";
     cin >> choice;
 
     if (choice == 1)
@@ -216,7 +249,7 @@ void showProjectsSorted(User &user)
     }
     else
     {
-        cout << "Invalid choice!" << endl;
+        cout << "¡Opción inválida!" << endl;
     }
 }
 
@@ -229,7 +262,7 @@ void showProjectsSorted(User &user)
 void searchProject(const User &user, string projectName)
 {
     set<Project *> userProjects = *user.getProjects();
-    userProjects.empty() ? cout << "No projects to show" << endl : cout << "Projects: " << endl;
+    userProjects.empty() ? cout << "No hay proyectos para mostrar" << endl : cout << "Proyectos: " << endl;
     for (auto &project : userProjects)
     {
         if (project->getTitle() == projectName)
@@ -249,20 +282,20 @@ void showTasksRelatedWithProject(Project &project)
 {
     if (projects.find(project) == projects.end())
     {
-        cout << "Project not found!" << endl;
+        cout << "¡Proyecto no encontrado!" << endl;
         return;
     }
     Board board = project.getBoard();
     map<PriorityType, queue<Task>> taskQueues = board.getTaskQueues();
-    taskQueues.empty() ? cout << "No tasks to show" << endl : cout << "Tasks: " << endl;
+    taskQueues.empty() ? cout << "No hay tareas para mostrar" << endl : cout << "Tareas: " << endl;
     for (auto &taskQueue : taskQueues)
     {
-        cout << "Priority: " << taskQueue.first << endl;
+        cout << "Prioridad: " << taskQueue.first << endl;
         queue<Task> tasks = taskQueue.second;
         while (!tasks.empty())
         {
             Task task = tasks.front();
-            cout << "Task: " << task.getTitle() << " State: " << task.getStatus() << endl;
+            cout << "Tarea: " << task.getTitle() << " Estado: " << task.getStatus() << endl;
             tasks.pop();
         }
     }
@@ -277,7 +310,7 @@ void showTasksRelatedWithProject(Project &project)
 void addReactionToNote(Note &note, ReactionType &reaction)
 {
     note.addReaction(reaction);
-    cout << "Reacción " << reactionToString(reaction) << " agregada exitosamente!" << endl;
+    cout << "¡Reacción " << reactionToString(reaction) << " agregada exitosamente!" << endl;
 }
 
 /**
@@ -285,11 +318,15 @@ void addReactionToNote(Note &note, ReactionType &reaction)
  * @param note Nota a la que se le eliminará 1 de la reacción escogida
  * @param reaction Reacción a la cual se le eliminará 1
  * @return void
-*/
-void removeReactionFromNote(Note &note, ReactionType &reaction) {
-    if (note.removeReaction(reaction)) {
-        cout << "Reacción " << reactionToString(reaction) << " eliminada exitosamente!" << endl;
-    } else {
+ */
+void removeReactionFromNote(Note &note, ReactionType &reaction)
+{
+    if (note.removeReaction(reaction))
+    {
+        cout << "¡Reacción " << reactionToString(reaction) << " eliminada exitosamente!" << endl;
+    }
+    else
+    {
         cout << "No hay reacciones que eliminar" << endl;
     }
 }
@@ -317,13 +354,13 @@ void chooseReaction(Note &note)
 
     while (true)
     {
-        cout << "Enter your choice: ";
+        cout << "Ingresa tu opción: ";
         cin >> choice;
         if (choice == 7)
             break;
         if (choice < 1 || choice > 7)
         {
-            cout << "Invalid choice!" << endl;
+            cout << "¡Opción inválida!" << endl;
             continue;
         }
         reaction = (ReactionType)(choice - 1);
@@ -334,7 +371,7 @@ void chooseReaction(Note &note)
 
 /**
  * @brief Permite mostrar la cantidad de reacciones por tipo, de una nota
- * @param note Nota a la que se le visualizaran las reacciones
+ * @param note Nota a la que se le visualizarán las reacciones
  * @return void
  */
 void displayReactionsFromNote(Note &note)
