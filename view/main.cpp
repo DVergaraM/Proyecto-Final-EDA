@@ -18,7 +18,7 @@ void menu() {
                 actividades_recurrentes();
                 break;
             case 2:
-                responsables_por_nombre();
+                responsables_por_nombre(); // FIXME: Ponerle parametrós a la función.
                 break;
             case 3:
                 cout << "Saliendo del programa..." << endl;

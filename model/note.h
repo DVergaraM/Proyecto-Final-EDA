@@ -43,30 +43,96 @@ private:
     string title;
     string content;
     stack<Comment> comments;
+    map<ReactionType, int> reactions;
 
 public:
     /**
      * @brief Constructor vacío de la clase Note
-    */
-    Note() : author(nullptr), title(""), content("") {}
+     */
+    Note() : author(nullptr), title(""), content("")
+    {
+        reactions[LIKE] = 0;
+        reactions[LAUGH] = 0;
+        reactions[WOW] = 0;
+        reactions[SAD] = 0;
+        reactions[ANGRY] = 0;
+        reactions[NONE] = 0;
+    }
     /**
      * @brief Constructor de la clase Note
      */
-    Note(User *author, string title, string content) : author(author), title(title), content(content){};
+    Note(User *author, string title, string content) : author(author), title(title), content(content)
+    {
+        reactions[LIKE] = 0;
+        reactions[LAUGH] = 0;
+        reactions[WOW] = 0;
+        reactions[SAD] = 0;
+        reactions[ANGRY] = 0;
+        reactions[NONE] = 0;
+    };
 
     // Getters
     User *getAuthor() const { return author; };
     string getTitle() const { return title; };
     string getContent() const { return content; };
     stack<Comment> getComments() const { return comments; };
+    map<ReactionType, int> getReactions() const { return reactions; }
+    std::set<ReactionType> getReactionsKeys() const
+    {
+        std::set<ReactionType> reactionSet;
+        for (auto reaction : reactions)
+        {
+            reactionSet.insert(reaction.first);
+        }
+        return reactionSet;
+    }
+
+    std::set<int> getReactionsValues() const
+    {
+        std::set<int> reactionValues;
+        for (auto reaction : reactions)
+        {
+            reactionValues.insert(reaction.second);
+        }
+        return reactionValues;
+    }
 
     // Setters
     void setAuthor(User *author) { this->author = author; };
     void setTitle(string title) { this->title = title; };
     void setContent(string content) { this->content = content; };
     void setComments(stack<Comment> comments) { this->comments = comments; };
+    void updateReaction(ReactionType oldReaction, ReactionType newReaction)
+    {
+        reactions[newReaction] = reactions[oldReaction];
+        reactions.erase(oldReaction);
+    }
 
     // Métodos
+
+    /**
+     * @brief Método para agregar una reacción a latarea.
+     * @return void
+     */
+    void addReaction(ReactionType reaction)
+    {
+        reactions[reaction]++;
+    }
+
+    /**
+     * @brief Método para eliminar la última reacción de la tarea.
+     * @return void
+     * @pre No hay reacciones del tipo en la tarea.
+     */
+    bool removeReaction(ReactionType reaction)
+    {
+        if (reactions[reaction] == 0)
+        {
+            return false;
+        }
+        reactions[reaction]--;
+        return true;
+    }
 
     /**
      * @brief Añade un comentario a la pila de comentarios
@@ -84,11 +150,30 @@ public:
      */
     void removeComment()
     {
-        if (!comments.empty()) {
+        if (!comments.empty())
+        {
             comments.pop();
             return;
         }
         cout << "No hay comentarios que eliminar" << endl;
+    }
+
+    void updateComment(Comment oldComment, Comment newComment)
+    {
+        stack<Comment> temp;
+        while (!comments.empty())
+        {
+            if (comments.top().author == oldComment.author && comments.top().content == oldComment.content)
+            {
+                temp.push(newComment);
+            }
+            else
+            {
+                temp.push(comments.top());
+            }
+            comments.pop();
+        }
+        comments = temp;
     }
 
     /**
@@ -152,6 +237,11 @@ public:
         {
             os << temp.top().author << ": " << temp.top().content << endl;
             temp.pop();
+        }
+        os << "Reactions: ";
+        for (auto reaction : note.getReactions())
+        {
+            os << reaction.first << ": " << reaction.second << " ";
         }
         return os;
     }

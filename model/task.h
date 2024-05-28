@@ -13,86 +13,147 @@ struct Date
     int year;
     Date() : day(1), month(1), year(2000) {}
     Date(int day, int month, int year) : day(day), month(month), year(year) {}
+    friend ostream &operator<<(ostream &os, const Date &date)
+    {
+        os << date.day << "/" << date.month << "/" << date.year;
+        return os;
+    }
+
+    bool operator<(const Date &date)
+    {
+        if (this->year < date.year)
+            return true;
+        if (this->month < date.month)
+            return true;
+        if (this->day < date.day)
+            return true;
+        if (this->year > date.year)
+            return false;
+        if (this->month > date.month)
+            return false;
+
+        return false;
+    }
+
+    bool operator<=(const Date &date)
+    {
+        return *this < date || *this == date;
+    }
+    bool operator>(const Date &date)
+    {
+        return !(*this <= date);
+    }
+    bool operator>=(const Date &date)
+    {
+        return !(*this < date);
+    }
+
+    bool operator==(const Date &date)
+    {
+        return this->day == date.day &&
+               this->month == date.month &&
+               this->year == date.year;
+    }
 };
 
 class Task
 {
 private:
+    int id;
     string title;
     string description;
     Date dueDate;
     StatusType status;
     PriorityType priority;
-    User *assignee;
+    std::set<User *> assignees;
     User *reporter;
     vector<User *> watchers;
     stack<Note> notes;
-    map<ReactionType, int> reactions;
 
 public:
     /**
      * @brief Constructor vacío de la clase Task
      */
-    Task() : title(""), description(""), dueDate(Date()), status(OPEN), priority(LOW), assignee(nullptr), reporter(nullptr) {
-        reactions[LIKE] = 0;
-        reactions[LAUGH] = 0;
-        reactions[WOW] = 0;
-        reactions[SAD] = 0;
-        reactions[ANGRY] = 0;
-        reactions[NONE] = 0;
+    Task() : title(""), description(""), dueDate(Date()), status(OPEN), priority(LOW), assignees({}), reporter(nullptr)
+    {
+        id = rand() % 1000 + 1;
     }
     /**
      * @brief Constructor de la clase Task
      */
-    Task(string title, string description, User *reporter, Date dueDate) : title(title), description(description), dueDate(dueDate), status(OPEN), priority(LOW), assignee(nullptr), reporter(reporter) {
-        reactions[LIKE] = 0;
-        reactions[LAUGH] = 0;
-        reactions[WOW] = 0;
-        reactions[SAD] = 0;
-        reactions[ANGRY] = 0;
-        reactions[NONE] = 0;
+    Task(string title, string description, User *reporter, Date dueDate) : title(title), description(description), dueDate(dueDate), status(OPEN), priority(LOW), assignees({}), reporter(reporter)
+    {
+        id = rand() % 1000 + 1;
     }
 
     // Getters
+    int getId() const { return id; }
     string getTitle() const { return title; }
     string getDescription() const { return description; }
     Date getDueDate() const { return dueDate; }
     StatusType getStatus() const { return status; }
     PriorityType getPriority() const { return priority; }
-    User *getAssignee() const { return assignee; }
+    std::set<User *> getAssignees() const { return assignees; }
     User *getReporter() const { return reporter; }
     vector<User *> getWatchers() const { return watchers; }
     stack<Note> getNotes() const { return notes; }
-    map<ReactionType, int> getReactions() const { return reactions; }
-    set<ReactionType> getReactionsKeys() const
-    {
-        set<ReactionType> reactionSet;
-        for (auto reaction : reactions)
-        {
-            reactionSet.insert(reaction.first);
-        }
-        return reactionSet;
-    }
-
-    set<int> getReactionsValues() const
-    {
-        set<int> reactionValues;
-        for (auto reaction : reactions)
-        {
-            reactionValues.insert(reaction.second);
-        }
-        return reactionValues;
-    }
+    
+    
 
     // Setters
 
+    void setId(int id) { this->id = id; }
     void setTitle(string title) { this->title = title; }
     void setDescription(string description) { this->description = description; }
     void setDueDate(Date dueDate) { this->dueDate = dueDate; }
     void setStatus(StatusType status) { this->status = status; }
     void setPriority(PriorityType priority) { this->priority = priority; }
-    void setAssignee(User *assignee) { this->assignee = assignee; }
+    void setAssignees(std::set<User *> assignees) { this->assignees = assignees; }
+    void addAssignee(User *assignee) { assignees.insert(assignee); }
+    void removeAssignee(User *assignee) { assignees.erase(remove(assignees.begin(), assignees.end(), assignee), assignees.end()); }
     void setReporter(User *reporter) { this->reporter = reporter; }
+
+    /**
+     * @brief Actualiza un usuario
+     * @param oldUser Usuario viejo
+     * @param newUser Usuario nuevo
+     * @return void
+     */
+    void updateAssignee(User *oldUser, User *newUser)
+    {
+        removeAssignee(oldUser);
+        addAssignee(newUser);
+    }
+
+    /**
+     * @brief Actualiza una nota
+     * @param oldNote Nota vieja
+     * @param newNote Nota nueva
+     * @return void
+     */
+    void updateNote(Note oldNote, Note newNote)
+    {
+        stack<Note> temp;
+        while (!notes.empty())
+        {
+            if (notes.top() == oldNote)
+            {
+                temp.push(newNote);
+            }
+            else
+            {
+                temp.push(notes.top());
+            }
+            notes.pop();
+        }
+        while (!temp.empty())
+        {
+            notes.push(temp.top());
+            temp.pop();
+        }
+    }
+
+    
 
     // Métodos
 
@@ -115,9 +176,9 @@ public:
             return;
         }
 
-        if (watcher == assignee)
+        if (find(assignees.begin(), assignees.end(), watcher) != assignees.end())
         {
-            cout << "El usuario ya es el asignado de la tarea" << endl;
+            cout << "El usuario ya es asignado de la tarea" << endl;
             return;
         }
         cout << "El usuario ya es espectador de la tarea" << endl;
@@ -188,21 +249,13 @@ public:
         cout << "No hay notas que eliminar" << endl;
     }
 
-    void addReaction(ReactionType reaction)
-    {
-        reactions[reaction]++;
-    }
+    
 
-    void removeReaction(ReactionType reaction)
-    {
-        if (reactions[reaction] == 0)
-        {
-            cout << "No hay reacciones que eliminar" << endl;
-            return;
-        }
-        reactions[reaction]--;
-    }
-
+    /**
+     * @brief Muestra las notas en la tarea.
+     * @return void
+     * @pre No hay notas en la tarea.
+     */
     void showNotes()
     {
         if (notes.empty())
@@ -218,6 +271,9 @@ public:
         }
     }
 
+    /**
+     * @brief Destructor de la tarea, por medio de la eliminación de las notas hasta que este vacio.
+     */
     ~Task()
     {
         while (!notes.empty())
@@ -226,6 +282,14 @@ public:
         }
     }
 
+    // Sobrecarga de operadores
+
+    /**
+     * @brief Sobrecarga del operador de inserción
+     * @param os Stream de salida.
+     * @param task Tarea a imprimir
+     * @return ostream&
+     */
     friend ostream &operator<<(ostream &os, const Task &task)
     {
         os << "Title: " << task.getTitle() << endl;
@@ -233,8 +297,12 @@ public:
         os << "Due Date: " << task.getDueDate().day << "/" << task.getDueDate().month << "/" << task.getDueDate().year << endl;
         os << "Status: " << statusToString(task.getStatus()) << endl;
         os << "Priority: " << priorityToString(task.getPriority()) << endl;
-        os << "Assignee: " << task.getAssignee() << endl;
         os << "Reporter: " << task.getReporter() << endl;
+        os << "Assignees: ";
+        for (User *assignee : task.getAssignees())
+        {
+            os << assignee << " ";
+        }
         os << "Watchers: ";
         for (User *watcher : task.getWatchers())
         {
@@ -248,23 +316,28 @@ public:
             os << temp.top().getTitle() << ": " << temp.top().getContent() << endl;
             temp.pop();
         }
-        os << "Reactions: ";
-        for (auto reaction : task.getReactions())
-        {
-            os << reaction.first << ": " << reaction.second << " ";
-        }
         os << endl;
         return os;
     }
 
+    /**
+     * @brief Sobrecarga del operador de comparación menor que
+     * @param task Tarea a comparar
+     * @return bool
+     */
     bool operator<(const Task &task) const
     {
         return this->dueDate.year < task.getDueDate().year;
     }
 
+    /**
+     * @brief Sobrecarga del operador de comparación igual que
+     * @param task Tarea a comparar
+     * @return bool
+     */
     bool operator==(const Task &task) const
     {
-        return this->title == task.getTitle();
+        return this->id == task.getId();
     }
 };
 
